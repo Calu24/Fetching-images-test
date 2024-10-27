@@ -9,7 +9,6 @@ class ImgurState extends Equatable {
 
   ImgurState copyWith({
     bool? isLoading,
-    bool? isSubmitted,
   }) =>
       ImgurState(
         isLoading: isLoading ?? this.isLoading,
