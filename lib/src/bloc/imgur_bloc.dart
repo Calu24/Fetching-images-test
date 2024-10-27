@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:spartapp_ayala_lucas/src/models/gallery_response.dart';
 
 part 'imgur_state.dart';
 
@@ -17,9 +18,18 @@ class ImgurCubit extends Cubit<ImgurState> {
       'Authorization': 'Client-ID $clientId',
     };
     final response = await http.get(url, headers: headers);
-    print(response.body);
+    final jsonData = response.body;
+    final galleries = GalleryResponse.fromJson(jsonData);
 
-    emit(state.copyWith(isLoading: false));
+    List<String> imagesLink = [];
+
+    for (var gallery in galleries.data) {
+      for (var images in gallery.images) {
+        imagesLink.add(images.link);
+      }
+    }
+
+    emit(state.copyWith(isLoading: false, imagesLink: imagesLink));
   }
 
   Future<void> search(String query) async {

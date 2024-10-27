@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 class GalleryResponse {
   final List<GalleryData> data;
 
   GalleryResponse({required this.data});
 
-  factory GalleryResponse.fromJson(Map<String, dynamic> json) {
+  factory GalleryResponse.fromJson(String str) =>
+      GalleryResponse.fromMap(json.decode(str));
+
+  factory GalleryResponse.fromMap(Map<String, dynamic> json) {
     var dataList = json['data'] as List;
     List<GalleryData> data =
         dataList.map((i) => GalleryData.fromJson(i)).toList();
@@ -48,16 +53,21 @@ class GalleryData {
 
 class GalleryImage {
   final String id;
+  final String link;
 
-  GalleryImage({required this.id});
+  GalleryImage({required this.id, required this.link});
 
   factory GalleryImage.fromJson(Map<String, dynamic> json) {
-    return GalleryImage(id: json['id']);
+    return GalleryImage(
+      id: json['id'],
+      link: json['link'],
+    );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'link': link,
     };
   }
 }
