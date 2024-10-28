@@ -18,7 +18,7 @@ class ImgurApp extends StatelessWidget {
         title: 'Flutter Test - Spartapp Ayala Lucas',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green[300]!),
           useMaterial3: true,
         ),
         home: const HomePage(),

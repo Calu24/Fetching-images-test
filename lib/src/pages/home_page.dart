@@ -1,8 +1,9 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spartapp_ayala_lucas/src/bloc/imgur_bloc.dart';
-import 'package:spartapp_ayala_lucas/src/widgets/image_card_widget.dart';
+import 'package:spartapp_ayala_lucas/src/search/search_delegate.dart';
+import 'package:spartapp_ayala_lucas/src/widgets/background_app_widget.dart';
+import 'package:spartapp_ayala_lucas/src/widgets/image_slider_widget.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -27,37 +28,17 @@ class HomePage extends StatelessWidget {
                   Icons.search_outlined,
                   color: Colors.green,
                 ),
-                onPressed: () => {},
-                // onPressed: () => showSearch(
-                //     context: context, delegate: MovieSearchDelegate()),
+                onPressed: () => showSearch(
+                    context: context, delegate: ImageSearchDelegate()),
               )
             ],
           ),
           body: Stack(
             children: [
-              Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color.fromARGB(255, 1, 23, 42),
-                      Color.fromARGB(255, 96, 95, 95),
-                    ],
-                  ),
-                ),
-              ),
+              const BackgroundApp(),
               Center(
-                child: CarouselSlider.builder(
-                  itemCount: state.imagesLink.length,
-                  itemBuilder: (BuildContext context, int itemIndex, int i) =>
-                      ImageCard(imageLink: state.imagesLink[itemIndex]),
-                  options: CarouselOptions(
-                    height: MediaQuery.of(context).size.height,
-                    scrollDirection: Axis.vertical,
-                    enlargeCenterPage: true,
-                    enableInfiniteScroll: false,
-                  ),
+                child: ImageSlider(
+                  imagesLink: state.imagesLink,
                 ),
               ),
               Padding(
