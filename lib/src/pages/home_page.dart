@@ -4,6 +4,7 @@ import 'package:spartapp_ayala_lucas/src/bloc/imgur_bloc.dart';
 import 'package:spartapp_ayala_lucas/src/search/search_delegate.dart';
 import 'package:spartapp_ayala_lucas/src/widgets/background_app_widget.dart';
 import 'package:spartapp_ayala_lucas/src/widgets/image_slider_widget.dart';
+import 'package:spartapp_ayala_lucas/src/widgets/shimmer_widget.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -37,9 +38,11 @@ class HomePage extends StatelessWidget {
             children: [
               const BackgroundApp(),
               Center(
-                child: ImageSlider(
-                  imagesLink: state.imagesLink,
-                ),
+                child: state.isLoading
+                    ? const ShimmerWidget()
+                    : ImageSlider(
+                        imagesLink: state.imagesLink,
+                      ),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),

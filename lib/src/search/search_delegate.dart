@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spartapp_ayala_lucas/src/bloc/imgur_bloc.dart';
 import 'package:spartapp_ayala_lucas/src/widgets/background_app_widget.dart';
 import 'package:spartapp_ayala_lucas/src/widgets/image_slider_widget.dart';
+import 'package:spartapp_ayala_lucas/src/widgets/shimmer_widget.dart';
 
 class ImageSearchDelegate extends SearchDelegate {
   @override
@@ -62,7 +63,7 @@ class ImageSearchDelegate extends SearchDelegate {
           child: Icon(
             Icons.image,
             color: Colors.white38,
-            size: 130,
+            size: ShimmerWidget.size,
           ),
         ),
       ],
@@ -83,6 +84,12 @@ class ImageSearchDelegate extends SearchDelegate {
         StreamBuilder(
           stream: context.read<ImgurCubit>().suggestionStream,
           builder: (_, AsyncSnapshot<List<String>> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: ShimmerWidget(),
+              );
+            }
+
             if (!snapshot.hasData) return _emptyContainer();
 
             final imagesLink = snapshot.data!;

@@ -20,32 +20,11 @@ class ImgurCubit extends Cubit<ImgurState> {
   Stream<List<String>> get suggestionStream =>
       _suggestionStreamContoller.stream;
 
-  Future<void> getPopularImages() async {
-    final url = Uri.https('api.imgur.com', '3/gallery/hot/viral/week/1');
-    final clientId = dotenv.env['client-id'];
-    final headers = {
-      'Authorization': 'Client-ID $clientId',
-    };
-    final response = await http.get(url, headers: headers);
-    final jsonData = response.body;
-    final galleries = GalleryResponse.fromJson(jsonData);
-
-    List<String> imagesLink = [];
-
-    for (var gallery in galleries.data) {
-      for (var images in gallery.images) {
-        imagesLink.add(images.link);
-      }
-    }
-
-    return emit(state.copyWith(imagesLink: imagesLink));
-  }
-
-  Future<List<String>> searchImage(String query) async {
+  void getPopularImages() async {
     emit(state.copyWith(isLoading: true));
 
     final url = Uri.https(
-        'api.imgur.com', '3/gallery/search/viral/all/1', {'q': query});
+        'api.imgur.com', '3/gallery/hot/viral/week/${state.popularPageNumber}');
     final clientId = dotenv.env['client-id'];
     final headers = {
       'Authorization': 'Client-ID $clientId',
@@ -62,7 +41,32 @@ class ImgurCubit extends Cubit<ImgurState> {
       }
     }
 
-    emit(state.copyWith(isLoading: false));
+    imagesLink = imagesLink.take(5).toList();
+
+    return emit(
+      state.copyWith(imagesLink: imagesLink, isLoading: false),
+    );
+  }
+
+  Future<List<String>> searchImage(String query) async {
+    final url = Uri.https('api.imgur.com',
+        '3/gallery/search/viral/all/${state.searchPageNumber}', {'q': query});
+    final clientId = dotenv.env['client-id'];
+    final headers = {
+      'Authorization': 'Client-ID $clientId',
+    };
+    final response = await http.get(url, headers: headers);
+    final jsonData = response.body;
+    final galleries = GalleryResponse.fromJson(jsonData);
+
+    List<String> imagesLink = [];
+
+    for (var gallery in galleries.data) {
+      for (var images in gallery.images) {
+        imagesLink.add(images.link);
+      }
+    }
+
     return imagesLink;
   }
 
@@ -79,5 +83,9 @@ class ImgurCubit extends Cubit<ImgurState> {
 
     Future.delayed(const Duration(milliseconds: 301))
         .then((_) => timer.cancel());
+  }
+
+  void nextPage() {
+    emit(state.copyWith(popularPageNumber: state.popularPageNumber + 1));
   }
 }
