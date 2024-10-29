@@ -26,7 +26,7 @@ class ImgurCubit extends Cubit<ImgurState> {
 
     final url = Uri.https('api.imgur.com', '3/gallery/hot/viral/week/1');
     //final clientId = dotenv.env['client-id'];
-    final clientId = 090e58d5dba0f9c;
+    const clientId = '090e58d5dba0f9c';
     final headers = {
       'Authorization': 'Client-ID $clientId',
     };
