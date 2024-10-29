@@ -1,7 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:spartapp_ayala_lucas/src/bloc/imgur_bloc.dart';
 import 'package:spartapp_ayala_lucas/src/widgets/image_card_widget.dart';
 
 class ImageSlider extends StatelessWidget {
@@ -24,11 +22,6 @@ class ImageSlider extends StatelessWidget {
         enlargeCenterPage: true,
         enableInfiniteScroll: false,
         animateToClosest: true,
-        onScrolled: (value) {
-          if (value == imagesLink.length - 2) {
-            context.read<ImgurCubit>().getPopularImages();
-          }
-        },
       ),
     );
   }

@@ -3,34 +3,46 @@ part of 'imgur_bloc.dart';
 class ImgurState extends Equatable {
   const ImgurState({
     this.isLoading = false,
-    this.imagesLink = const [],
-    this.popularPageNumber = 1,
+    this.imagesLinks = const [],
     this.searchPageNumber = 1,
+    this.galleryModels = const [],
+    this.selectedImage,
+    this.favoriteImages = const [],
   });
 
   final bool isLoading;
-  final List<String> imagesLink;
-  final int popularPageNumber;
+  final List<String> imagesLinks;
   final int searchPageNumber;
+  final List<GalleryModel> galleryModels;
+  final FavoriteImageModel? selectedImage;
+  final List<FavoriteImageModel> favoriteImages;
+
+  bool get isFirstPage => searchPageNumber == 1;
 
   ImgurState copyWith({
     bool? isLoading,
-    List<String>? imagesLink,
-    int? popularPageNumber,
+    List<String>? imagesLinks,
     int? searchPageNumber,
+    List<GalleryModel>? galleryModels,
+    FavoriteImageModel? selectedImage,
+    List<FavoriteImageModel>? favoriteImages,
   }) =>
       ImgurState(
         isLoading: isLoading ?? this.isLoading,
-        imagesLink: imagesLink ?? this.imagesLink,
-        popularPageNumber: popularPageNumber ?? this.popularPageNumber,
+        imagesLinks: imagesLinks ?? this.imagesLinks,
         searchPageNumber: searchPageNumber ?? this.searchPageNumber,
+        galleryModels: galleryModels ?? this.galleryModels,
+        selectedImage: selectedImage ?? this.selectedImage,
+        favoriteImages: favoriteImages ?? this.favoriteImages,
       );
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         isLoading,
-        imagesLink,
-        popularPageNumber,
+        imagesLinks,
         searchPageNumber,
+        galleryModels,
+        selectedImage,
+        favoriteImages,
       ];
 }

@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:spartapp_ayala_lucas/src/models/gallery_model.dart';
-
 class GalleryResponse {
   final List<GalleryModel> data;
 
@@ -21,6 +19,55 @@ class GalleryResponse {
   Map<String, dynamic> toJson() {
     return {
       'data': data.map((v) => v.toJson()).toList(),
+    };
+  }
+}
+
+class GalleryModel {
+  final String id;
+  final String title;
+  final List<ImageGallery> images;
+
+  GalleryModel({required this.id, required this.title, required this.images});
+
+  factory GalleryModel.fromJson(Map<String, dynamic> json) {
+    var imagesList = json['images'] as List? ?? [];
+    List<ImageGallery> images =
+        imagesList.map((i) => ImageGallery.fromJson(i)).toList();
+
+    return GalleryModel(
+      id: json['id'],
+      title: json['title'],
+      images: images,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'images': images.map((v) => v.toJson()).toList(),
+    };
+  }
+}
+
+class ImageGallery {
+  final String id;
+  final String link;
+
+  ImageGallery({required this.id, required this.link});
+
+  factory ImageGallery.fromJson(Map<String, dynamic> json) {
+    return ImageGallery(
+      id: json['id'],
+      link: json['link'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'link': link,
     };
   }
 }
