@@ -63,7 +63,7 @@ void main() {
       },
       act: (cubit) => cubit.searchImage('query'),
       expect: () => [
-        const ImgurState(galleryModels: []),
+        const ImgurState(galleryModels: [], query: 'query'),
       ],
     );
 
@@ -76,7 +76,7 @@ void main() {
       },
       act: (cubit) => cubit.searchImage('query'),
       expect: () => [
-        const ImgurState(),
+        const ImgurState(galleryModels: [], query: 'query'),
       ],
     );
   });

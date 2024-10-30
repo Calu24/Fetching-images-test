@@ -29,6 +29,8 @@ class ImgurCubit extends Cubit<ImgurState> {
       final galleries = await imgurRepository.fetchPopularImages();
       List<String> imagesLink = [];
 
+      if (galleries == null) return emit(state.copyWith(isLoading: false));
+
       for (var gallery in galleries) {
         for (var images in gallery.images) {
           imagesLink.add(images.link);
@@ -48,6 +50,11 @@ class ImgurCubit extends Cubit<ImgurState> {
     try {
       final galleries = await imgurRepository.searchImages(query);
 
+      if (galleries == null) {
+        emit(state.copyWith(galleryModels: [], query: query));
+        return [];
+      }
+
       emit(state.copyWith(galleryModels: galleries, query: query));
       return galleries;
     } catch (e) {
@@ -64,6 +71,8 @@ class ImgurCubit extends Cubit<ImgurState> {
     try {
       final galleries = await imgurRepository.loadMoreImages(
           state.query, state.searchPageNumber + 1);
+
+      if (galleries == null) return emit(state.copyWith(isLoading: false));
 
       final galleriesTotal = [...state.galleryModels, ...galleries];
 
