@@ -8,6 +8,7 @@ class ImgurState extends Equatable {
     this.galleryModels = const [],
     this.selectedImage,
     this.favoriteImages = const [],
+    this.query = '',
   });
 
   final bool isLoading;
@@ -16,6 +17,7 @@ class ImgurState extends Equatable {
   final List<GalleryModel> galleryModels;
   final FavoriteImageModel? selectedImage;
   final List<FavoriteImageModel> favoriteImages;
+  final String query;
 
   bool get isFirstPage => searchPageNumber == 1;
 
@@ -26,6 +28,7 @@ class ImgurState extends Equatable {
     List<GalleryModel>? galleryModels,
     FavoriteImageModel? selectedImage,
     List<FavoriteImageModel>? favoriteImages,
+    String? query,
   }) =>
       ImgurState(
         isLoading: isLoading ?? this.isLoading,
@@ -34,6 +37,7 @@ class ImgurState extends Equatable {
         galleryModels: galleryModels ?? this.galleryModels,
         selectedImage: selectedImage ?? this.selectedImage,
         favoriteImages: favoriteImages ?? this.favoriteImages,
+        query: query ?? this.query,
       );
 
   @override
@@ -44,5 +48,6 @@ class ImgurState extends Equatable {
         galleryModels,
         selectedImage,
         favoriteImages,
+        query,
       ];
 }

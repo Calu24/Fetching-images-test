@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:spartapp_ayala_lucas/injection_container.dart';
 import 'package:spartapp_ayala_lucas/src/bloc/imgur_bloc.dart';
 import 'package:spartapp_ayala_lucas/src/pages/home_page.dart';
 
@@ -11,7 +12,7 @@ class ImgurApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => ImgurCubit(),
+          create: (context) => getIt<ImgurCubit>(),
         ),
       ],
       child: MaterialApp(

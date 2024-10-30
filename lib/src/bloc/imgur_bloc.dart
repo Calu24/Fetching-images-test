@@ -2,16 +2,17 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
 import 'package:spartapp_ayala_lucas/src/helpers/debouncer.dart';
 import 'package:spartapp_ayala_lucas/src/models/favorite_image_model.dart';
 import 'package:spartapp_ayala_lucas/src/models/gallery_response.dart';
+import 'package:spartapp_ayala_lucas/src/respositories/imgur_repository.dart';
 
 part 'imgur_state.dart';
 
 class ImgurCubit extends Cubit<ImgurState> {
-  ImgurCubit() : super(const ImgurState());
+  final ImgurRepository imgurRepository;
+
+  ImgurCubit(this.imgurRepository) : super(const ImgurState());
 
   final debouncer = Debouncer(
     duration: const Duration(milliseconds: 500),
@@ -22,44 +23,37 @@ class ImgurCubit extends Cubit<ImgurState> {
       _suggestionStreamContoller.stream;
 
   void getPopularImages() async {
-    emit(state.copyWith(isLoading: true));
+    try {
+      emit(state.copyWith(isLoading: true));
 
-    final url = Uri.https('api.imgur.com', '3/gallery/hot/viral/week/1');
-    //final clientId = dotenv.env['client-id'];
-    const clientId = '090e58d5dba0f9c';
-    final headers = {
-      'Authorization': 'Client-ID $clientId',
-    };
-    final response = await http.get(url, headers: headers);
-    final jsonData = response.body;
-    final galleries = GalleryResponse.fromJson(jsonData);
+      final galleries = await imgurRepository.fetchPopularImages();
+      List<String> imagesLink = [];
 
-    List<String> imagesLink = [];
-
-    for (var gallery in galleries.data) {
-      for (var images in gallery.images) {
-        imagesLink.add(images.link);
+      for (var gallery in galleries) {
+        for (var images in gallery.images) {
+          imagesLink.add(images.link);
+        }
       }
-    }
 
-    return emit(
-      state.copyWith(imagesLinks: imagesLink, isLoading: false),
-    );
+      return emit(
+        state.copyWith(imagesLinks: imagesLink, isLoading: false),
+      );
+    } catch (e) {
+      // print(e);
+      return emit(state.copyWith(isLoading: false));
+    }
   }
 
   Future<List<GalleryModel>> searchImage(String query) async {
-    final url = Uri.https('api.imgur.com',
-        '3/gallery/search/viral/all/${state.searchPageNumber}', {'q': query});
-    final clientId = dotenv.env['client-id'];
-    final headers = {
-      'Authorization': 'Client-ID $clientId',
-    };
-    final response = await http.get(url, headers: headers);
-    final jsonData = response.body;
-    final galleries = GalleryResponse.fromJson(jsonData);
+    try {
+      final galleries = await imgurRepository.searchImages(query);
 
-    emit(state.copyWith(galleryModels: galleries.data));
-    return galleries.data;
+      emit(state.copyWith(galleryModels: galleries, query: query));
+      return galleries;
+    } catch (e) {
+      // print(e);
+      return [];
+    }
   }
 
   Future<void> loadMoreImages() async {
@@ -67,23 +61,21 @@ class ImgurCubit extends Cubit<ImgurState> {
 
     emit(state.copyWith(isLoading: true));
 
-    final url = Uri.https('api.imgur.com',
-        '3/gallery/hot/viral/all/${state.searchPageNumber + 1}');
-    final clientId = dotenv.env['client-id'];
-    final headers = {
-      'Authorization': 'Client-ID $clientId',
-    };
-    final response = await http.get(url, headers: headers);
-    final jsonData = response.body;
-    final galleries = GalleryResponse.fromJson(jsonData);
+    try {
+      final galleries = await imgurRepository.loadMoreImages(
+          state.query, state.searchPageNumber + 1);
 
-    final galleriesTotal = [...state.galleryModels, ...galleries.data];
+      final galleriesTotal = [...state.galleryModels, ...galleries];
 
-    _suggestionStreamContoller.add(galleriesTotal);
-    emit(
-      state.copyWith(
-          isLoading: false, searchPageNumber: state.searchPageNumber + 1),
-    );
+      _suggestionStreamContoller.add(galleriesTotal);
+      return emit(
+        state.copyWith(
+            isLoading: false, searchPageNumber: state.searchPageNumber + 1),
+      );
+    } catch (e) {
+      // print(e);
+      return emit(state.copyWith(isLoading: false));
+    }
   }
 
   void getSuggestionsByQuery(String searchTerm) {
@@ -116,18 +108,22 @@ class ImgurCubit extends Cubit<ImgurState> {
   void toggleFavorite(FavoriteImageModel favImage) {
     final favoriteImages = List<FavoriteImageModel>.from(state.favoriteImages);
 
-    final isAlreadyFavorite = favoriteImages.any((image) => image.imageUrl == favImage.imageUrl);
+    final isAlreadyFavorite =
+        favoriteImages.any((image) => image.imageUrl == favImage.imageUrl);
 
     List<FavoriteImageModel> updatedFavorites;
     if (isAlreadyFavorite) {
       updatedFavorites = favoriteImages.map((favoriteImage) {
-      if (favoriteImage.imageUrl == favImage.imageUrl) {
-        return favoriteImage.copyWith(isFavorite: !favoriteImage.isFavorite);
-      }
-      return favoriteImage;
+        if (favoriteImage.imageUrl == favImage.imageUrl) {
+          return favoriteImage.copyWith(isFavorite: !favoriteImage.isFavorite);
+        }
+        return favoriteImage;
       }).toList();
     } else {
-      updatedFavorites = [...favoriteImages, favImage.copyWith(isFavorite: true)];
+      updatedFavorites = [
+        ...favoriteImages,
+        favImage.copyWith(isFavorite: true)
+      ];
     }
 
     emit(state.copyWith(
